@@ -86,25 +86,25 @@ class Cssmin
 		if ($this->options['compress'])
 			$css = Cssmin_Compressor::process($css, $this->options);
 
-		if ( ! $this->options['current_dir'] && ! $this->options['prepend_relative_path'])
-			return $css;
+		if ($this->options['prepend_relative_path'])
+		{
+			$css = Cssmin_Urirewriter::prepend(
+				$css,
+				$this->options['prepend_relative_path']
+			);
+		}
 
 		if ($this->options['current_dir'])
 		{
-			return Cssmin_Urirewriter::rewrite(
+			$css = Cssmin_Urirewriter::rewrite(
 				$css,
 				$this->options['current_dir'],
 				$this->options['doc_root'],
 				$this->options['symlinks']
 			);
 		}
-		else
-		{
-			return Cssmin_Urirewriter::prepend(
-				$css,
-				$this->options['prepend_relative_path']
-			);
-		}
+
+		return $css;
 	}
 
 }

@@ -50,11 +50,22 @@ class Controller_Minify extends Controller
 				$this->last_changetime = $last_changetime;
 
 			if ($this->mime == 'text/css')
-				$this->minified .= Cssmin::factory(file_get_contents($real_filename), array('current_dir' => $this->base))->min();
+			{
+				$options = array(
+					'current_dir'           => URL::base().$this->base,
+					'prepend_relative_path' => URL::base().$this->base.'/',
+				);
+
+				$this->minified .= Cssmin::factory(file_get_contents($real_filename), $options)->min();
+			}
 			elseif ($this->mime == 'application/javascript')
+			{
 				$this->minified .= Jsmin::factory(file_get_contents($real_filename))->min();
+			}
 			else // We cannot minify anything but css and js atm
+			{
 				$this->minified .= file_get_contents($real_filename);
+			}
 		}
 
 		$this->response->headers('Last-Modified', gmdate('D, d M Y H:i:s', $this->last_changetime).' GMT');

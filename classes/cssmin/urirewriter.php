@@ -299,15 +299,14 @@ class Cssmin_Urirewriter
 				$uri = self::$_prepend_path.$uri;
 				if ($uri[0] === '/')
 				{
-					$root          = '';
 					$root_relative = $uri;
-					$uri           = $root.self::remove_dots($root_relative);
+					$uri           = self::remove_dots($root_relative);
 				}
 				elseif (preg_match('@^((https?\:)?//([^/]+))/@', $uri, $m) && (FALSE !== strpos($m[3], '.')))
 				{
 					$root          = $m[1];
 					$root_relative = substr($uri, strlen($root));
-					$uri           = $root . self::remove_dots($root_relative);
+					$uri           = $root.self::remove_dots($root_relative);
 				}
 			}
 		}
