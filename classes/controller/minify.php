@@ -49,23 +49,33 @@ class Controller_Minify extends Controller
 			if ($last_changetime > $this->last_changetime)
 				$this->last_changetime = $last_changetime;
 
-			if ($this->mime == 'text/css')
+			$cache_file = APPPATH.'cache/minify_'.str_replace('/', '_', $real_filename).'_'.$last_changetime;
+
+			if (file_exists($cache_file))
+			{
+				$minified = file_get_contents($cache_file);
+			}
+			elseif ($this->mime == 'text/css')
 			{
 				$options = array(
 					'current_dir'           => URL::base().$this->base,
 					'prepend_relative_path' => URL::base().$this->base.'/',
 				);
 
-				$this->minified .= Cssmin::factory(file_get_contents($real_filename), $options)->min();
+				$minified = Cssmin::factory(file_get_contents($real_filename), $options)->min();
+				file_put_contents($cache_file, $minified);
 			}
 			elseif ($this->mime == 'application/javascript')
 			{
-				$this->minified .= Jsmin::factory(file_get_contents($real_filename))->min();
+				$minified = Jsmin::factory(file_get_contents($real_filename))->min();
+				file_put_contents($cache_file, $minified);
 			}
 			else // We cannot minify anything but css and js atm
 			{
-				$this->minified .= file_get_contents($real_filename);
+				$minified = file_get_contents($real_filename);
 			}
+
+			$this->minified .= $minified;
 		}
 
 		$this->response->headers('Last-Modified', gmdate('D, d M Y H:i:s', $this->last_changetime).' GMT');
